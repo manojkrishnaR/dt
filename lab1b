@@ -1,0 +1,199 @@
+# ============================================================
+# HEART DISEASE DATASET
+# KDD FRAMEWORK IMPLEMENTATION
+# ============================================================
+
+# -----------------------------
+# Step 1: Import Libraries
+# -----------------------------
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# -----------------------------
+# Step 2: Selection
+# -----------------------------
+
+df = pd.read_csv(r"D:\heart.csv")
+
+print("="*50)
+print("FIRST FIVE RECORDS")
+print("="*50)
+print(df.head())
+
+print("\nDataset Shape")
+print(df.shape)
+
+print("\nColumn Names")
+print(df.columns)
+
+# -----------------------------
+# Step 3: Preprocessing
+# -----------------------------
+
+print("\nMissing Values")
+print(df.isnull().sum())
+
+# Remove duplicate records
+df.drop_duplicates(inplace=True)
+
+# Fill Missing Values
+for col in df.columns:
+    df[col] = df[col].fillna(df[col].median())
+
+print("\nMissing Values After Cleaning")
+print(df.isnull().sum())
+
+print("\nDataset Information")
+print(df.info())
+
+print("\nStatistical Summary")
+print(df.describe())
+
+# -----------------------------
+# Step 4: Transformation
+# -----------------------------
+
+# Separate Features and Target
+
+X = df.drop("target", axis=1)
+
+y = df["target"]
+
+print("\nFeatures")
+print(X.head())
+
+print("\nTarget")
+print(y.head())
+
+# -----------------------------
+# Step 5: Data Mining
+# -----------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42
+)
+
+model = DecisionTreeClassifier(random_state=42)
+
+model.fit(X_train, y_train)
+
+prediction = model.predict(X_test)
+
+# -----------------------------
+# Step 6: Evaluation
+# -----------------------------
+
+accuracy = accuracy_score(y_test, prediction)
+
+print("\nAccuracy =", accuracy)
+
+print("\nClassification Report")
+print(classification_report(y_test, prediction))
+
+print("\nConfusion Matrix")
+print(confusion_matrix(y_test, prediction))
+
+# -----------------------------
+# Step 7: Knowledge Presentation
+# -----------------------------
+
+# Age Distribution
+plt.figure(figsize=(7,5))
+plt.hist(df["age"], bins=10)
+plt.title("Age Distribution")
+plt.xlabel("Age")
+plt.ylabel("Patients")
+plt.show()
+
+# Gender Distribution
+plt.figure(figsize=(6,4))
+sns.countplot(x="sex", data=df)
+plt.title("Gender Distribution")
+plt.show()
+
+# Chest Pain Type
+plt.figure(figsize=(7,5))
+sns.countplot(x="cp", data=df)
+plt.title("Chest Pain Type")
+plt.show()
+
+# Heart Disease
+plt.figure(figsize=(6,4))
+sns.countplot(x="target", data=df)
+plt.title("Heart Disease Distribution")
+plt.show()
+
+# Blood Pressure
+plt.figure(figsize=(7,5))
+plt.hist(df["trestbps"], bins=10)
+plt.title("Resting Blood Pressure")
+plt.show()
+
+# Cholesterol
+plt.figure(figsize=(7,5))
+plt.hist(df["chol"], bins=10)
+plt.title("Cholesterol Distribution")
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(12,8))
+sns.heatmap(df.corr(),
+            annot=True,
+            cmap="coolwarm",
+            linewidths=0.5)
+
+plt.title("Correlation Heatmap")
+plt.show()
+
+# -----------------------------
+# Feature Importance
+# -----------------------------
+
+importance = pd.DataFrame({
+    "Feature": X.columns,
+    "Importance": model.feature_importances_
+})
+
+importance = importance.sort_values(
+    by="Importance",
+    ascending=False
+)
+
+print("\nFeature Importance")
+print(importance)
+
+plt.figure(figsize=(10,6))
+sns.barplot(
+    data=importance,
+    x="Importance",
+    y="Feature"
+)
+
+plt.title("Feature Importance")
+plt.show()
+
+# -----------------------------
+# Final Output
+# -----------------------------
+
+print("="*50)
+print("KDD FRAMEWORK COMPLETED SUCCESSFULLY")
+print("="*50)
+
+print("Dataset Shape :", df.shape)
+
+print("Training Records :", len(X_train))
+
+print("Testing Records :", len(X_test))
+
+print("Decision Tree Accuracy :", round(accuracy*100,2), "%")
