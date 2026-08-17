@@ -1,0 +1,36 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+print(df.head())
+
+# Aggregate mean Selling_Price by manufacturing Year
+df_yearly = df.groupby("Year")["Selling_Price"].mean().reset_index()
+
+plt.figure(figsize=(11, 5))
+plt.plot(
+    df_yearly["Year"],
+    df_yearly["Selling_Price"],
+    marker="o",
+    linewidth=2,
+    color="crimson",
+)
+
+plt.title(
+    "Average Selling Price Trend by Model Year",
+    fontsize=14,
+    fontweight="bold",
+)
+plt.xlabel("Model Year", fontsize=12)
+plt.ylabel("Average Selling Price (Lakhs)", fontsize=12)
+plt.grid(True, linestyle="--", alpha=0.6)
+plt.tight_layout()
+plt.show()
