@@ -1,0 +1,50 @@
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+
+# 1. Load Data
+df = pd.read_csv("/content/oil_by_country.csv")
+
+# Clean column names by stripping trailing whitespace
+df.columns = df.columns.str.strip()
+
+print("Missing Values:")
+print(df.isnull().sum())
+print(f"\nDataFrame Columns: {df.columns.tolist()}")
+
+# 2. Outlier Detection using Interquartile Range (IQR)
+column_to_analyze = "Production"
+
+Q1 = df[column_to_analyze].quantile(0.25)
+Q3 = df[column_to_analyze].quantile(0.75)
+IQR = Q3 - Q1
+
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+outliers = df[
+    (df[column_to_analyze] < lower) | (df[column_to_analyze] > upper)
+]
+print("\nOutliers detected:")
+print(outliers)
+
+# 3. Min-Max Scaling on Numerical Columns
+scaler = MinMaxScaler()
+num_cols = df.select_dtypes(include=["int64", "float64"]).columns
+
+df[num_cols] = scaler.fit_transform(df[num_cols])
+print("\nScaled Numerical Columns:")
+print(df[num_cols].head())
+
+# 4. Encoding Categorical Data
+encoder = LabelEncoder()
+df["Country_Encoded"] = encoder.fit_transform(df["Country"])
+
+# Note: One-hot encoding example using pd.get_dummies
+df_dummies = pd.get_dummies(df["Country"], prefix="Country")
+
+# 5. Deduplication
+print("\nDuplicate rows found:", df.duplicated().sum())
+df.drop_duplicates(inplace=True)
+
+print("\nFinal Cleaned DataFrame:")
+print(df.head())
