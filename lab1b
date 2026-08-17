@@ -1,5 +1,5 @@
 # ============================================================
-# HEART DISEASE DATASET
+# CAR PREDICTION DATASET
 # KDD FRAMEWORK IMPLEMENTATION
 # ============================================================
 
@@ -13,14 +13,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
 # -----------------------------
 # Step 2: Selection
 # -----------------------------
 
-df = pd.read_csv(r"D:\heart.csv")
+df = pd.read_csv("car_prediction_data.csv")
 
 print("="*50)
 print("FIRST FIVE RECORDS")
@@ -43,9 +43,10 @@ print(df.isnull().sum())
 # Remove duplicate records
 df.drop_duplicates(inplace=True)
 
-# Fill Missing Values
+# Fill Missing Values (if any)
 for col in df.columns:
-    df[col] = df[col].fillna(df[col].median())
+    if df[col].dtype in ['float64', 'int64']:
+        df[col] = df[col].fillna(df[col].median())
 
 print("\nMissing Values After Cleaning")
 print(df.isnull().sum())
@@ -60,11 +61,18 @@ print(df.describe())
 # Step 4: Transformation
 # -----------------------------
 
+# Feature Engineering: Calculate Car Age from Manufacturing Year
+df['Car_Age'] = 2026 - df['Year']
+
+# Drop columns not suitable for modeling
+df_model = df.drop(columns=['Year', 'Car_Name'])
+
+# One-Hot Encoding for Categorical Features
+df_model = pd.get_dummies(df_model, drop_first=True)
+
 # Separate Features and Target
-
-X = df.drop("target", axis=1)
-
-y = df["target"]
+X = df_model.drop("Selling_Price", axis=1)
+y = df_model["Selling_Price"]
 
 print("\nFeatures")
 print(X.head())
@@ -83,7 +91,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-model = DecisionTreeClassifier(random_state=42)
+model = DecisionTreeRegressor(random_state=42)
 
 model.fit(X_train, y_train)
 
@@ -93,61 +101,59 @@ prediction = model.predict(X_test)
 # Step 6: Evaluation
 # -----------------------------
 
-accuracy = accuracy_score(y_test, prediction)
+r2 = r2_score(y_test, prediction)
+mae = mean_absolute_error(y_test, prediction)
+mse = mean_squared_error(y_test, prediction)
 
-print("\nAccuracy =", accuracy)
-
-print("\nClassification Report")
-print(classification_report(y_test, prediction))
-
-print("\nConfusion Matrix")
-print(confusion_matrix(y_test, prediction))
+print(f"\nR2 Score                = {r2:.4f}")
+print(f"Mean Absolute Error     = {mae:.4f}")
+print(f"Mean Squared Error      = {mse:.4f}")
 
 # -----------------------------
 # Step 7: Knowledge Presentation
 # -----------------------------
 
-# Age Distribution
+# Selling Price Distribution
 plt.figure(figsize=(7,5))
-plt.hist(df["age"], bins=10)
-plt.title("Age Distribution")
-plt.xlabel("Age")
-plt.ylabel("Patients")
+plt.hist(df["Selling_Price"], bins=15)
+plt.title("Selling Price Distribution")
+plt.xlabel("Selling Price (Lakhs)")
+plt.ylabel("Count")
 plt.show()
 
-# Gender Distribution
+# Fuel Type Distribution
 plt.figure(figsize=(6,4))
-sns.countplot(x="sex", data=df)
-plt.title("Gender Distribution")
+sns.countplot(x="Fuel_Type", data=df)
+plt.title("Fuel Type Distribution")
 plt.show()
 
-# Chest Pain Type
-plt.figure(figsize=(7,5))
-sns.countplot(x="cp", data=df)
-plt.title("Chest Pain Type")
-plt.show()
-
-# Heart Disease
+# Seller Type Distribution
 plt.figure(figsize=(6,4))
-sns.countplot(x="target", data=df)
-plt.title("Heart Disease Distribution")
+sns.countplot(x="Seller_Type", data=df)
+plt.title("Seller Type Distribution")
 plt.show()
 
-# Blood Pressure
-plt.figure(figsize=(7,5))
-plt.hist(df["trestbps"], bins=10)
-plt.title("Resting Blood Pressure")
+# Transmission Type Distribution
+plt.figure(figsize=(6,4))
+sns.countplot(x="Transmission", data=df)
+plt.title("Transmission Distribution")
 plt.show()
 
-# Cholesterol
+# Kilometers Driven Distribution
 plt.figure(figsize=(7,5))
-plt.hist(df["chol"], bins=10)
-plt.title("Cholesterol Distribution")
+plt.hist(df["Kms_Driven"], bins=15)
+plt.title("Kilometers Driven Distribution")
+plt.show()
+
+# Present Price Distribution
+plt.figure(figsize=(7,5))
+plt.hist(df["Present_Price"], bins=15)
+plt.title("Present Price Distribution")
 plt.show()
 
 # Correlation Heatmap
-plt.figure(figsize=(12,8))
-sns.heatmap(df.corr(),
+plt.figure(figsize=(10,6))
+sns.heatmap(df_model.corr(),
             annot=True,
             cmap="coolwarm",
             linewidths=0.5)
@@ -162,9 +168,7 @@ plt.show()
 importance = pd.DataFrame({
     "Feature": X.columns,
     "Importance": model.feature_importances_
-})
-
-importance = importance.sort_values(
+}).sort_values(
     by="Importance",
     ascending=False
 )
@@ -196,4 +200,4 @@ print("Training Records :", len(X_train))
 
 print("Testing Records :", len(X_test))
 
-print("Decision Tree Accuracy :", round(accuracy*100,2), "%")
+print("Decision Tree R2 Score :", round(r2 * 100, 2), "%")
