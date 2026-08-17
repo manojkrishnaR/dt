@@ -1,0 +1,35 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("india_cancer_patients_2022_2025.csv")
+df["Diagnosis_Date"] = pd.to_datetime(df["Diagnosis_Date"])
+
+print(df.head())
+plt.figure(figsize=(12, 6))
+
+sns.boxplot(
+    data=df,
+    x="Cancer_Type",
+    y="Survival_Months",
+    palette="Accent",
+    hue="Cancer_Type",
+    legend=False,
+)
+
+plt.title(
+    "Survival Months Distribution Across Cancer Types",
+    fontsize=14,
+    fontweight="bold",
+)
+plt.xlabel("Cancer Type", fontsize=12)
+plt.ylabel("Survival Duration (Months)", fontsize=12)
+plt.xticks(rotation=30, ha="right")
+plt.tight_layout()
+plt.show()
