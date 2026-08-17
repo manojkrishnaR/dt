@@ -1,0 +1,36 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+print(df.head())
+
+plt.figure(figsize=(9, 5))
+sns.scatterplot(
+    data=df,
+    x="Present_Price",
+    y="Selling_Price",
+    hue="Fuel_Type",
+    style="Fuel_Type",
+    palette={"Petrol": "orange", "Diesel": "teal", "CNG": "purple"},
+    alpha=0.8,
+    s=70,
+)
+
+plt.title(
+    "Present Price vs. Selling Price by Fuel Type",
+    fontsize=14,
+    fontweight="bold",
+)
+plt.xlabel("Present Price (Lakhs)", fontsize=12)
+plt.ylabel("Selling Price (Lakhs)", fontsize=12)
+plt.legend(title="Fuel Type")
+plt.tight_layout()
+plt.show()
