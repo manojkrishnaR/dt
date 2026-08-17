@@ -1,0 +1,35 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+# Convert manufacturing Year into age for numerical distribution analysis
+df["Car_Age"] = 2026 - df["Year"]
+
+print("First Five Records:")
+print(df.head())
+
+# Distribution Plot: Selling Price Distribution
+plt.figure(figsize=(9, 5))
+sns.histplot(
+    data=df,
+    x="Selling_Price",
+    bins=30,
+    kde=True,
+    color="teal",
+    edgecolor="black",
+    alpha=0.6,
+)
+
+plt.title("Distribution of Vehicle Selling Price", fontsize=14, fontweight="bold")
+plt.xlabel("Selling Price (Lakhs)", fontsize=12)
+plt.ylabel("Vehicle Count", fontsize=12)
+plt.tight_layout()
+plt.show()
