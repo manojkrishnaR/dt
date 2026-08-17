@@ -1,0 +1,46 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+print(df.head())
+
+plt.figure(figsize=(10, 5))
+
+# Filter top 10 most frequent car models
+order = df["Car_Name"].value_counts().head(10).index
+
+ax = sns.countplot(
+    data=df[df["Car_Name"].isin(order)],
+    y="Car_Name",
+    order=order,
+    palette="viridis",
+    hue="Car_Name",
+)
+
+plt.title("Frequency of Cases by Car Name (Top 10)", fontsize=14, fontweight="bold")
+plt.xlabel("Number of Vehicles", fontsize=12)
+plt.ylabel("Car Name", fontsize=12)
+
+# Add data labels to bars
+for p in ax.patches:
+    width = p.get_width()
+    if width > 0:
+        ax.annotate(
+            f"{int(width):,}",
+            (width, p.get_y() + p.get_height() / 2.0),
+            ha="left",
+            va="center",
+            xytext=(5, 0),
+            textcoords="offset points",
+        )
+
+plt.tight_layout()
+plt.show()
