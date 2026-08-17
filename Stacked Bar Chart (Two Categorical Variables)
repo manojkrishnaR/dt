@@ -1,0 +1,29 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+print(df.head())
+
+plt.figure(figsize=(9, 5))
+
+# Grouped Bar Plot: Fuel_Type vs Transmission
+sns.countplot(data=df, x="Fuel_Type", hue="Transmission", palette="Set2")
+
+plt.title(
+    "Vehicle Count by Fuel Type and Transmission",
+    fontsize=14,
+    fontweight="bold",
+)
+plt.xlabel("Fuel Type", fontsize=12)
+plt.ylabel("Vehicle Count", fontsize=12)
+plt.legend(title="Transmission")
+plt.tight_layout()
+plt.show()
