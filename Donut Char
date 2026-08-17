@@ -1,0 +1,33 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+print(df.head())
+
+fuel_counts = df["Fuel_Type"].value_counts()
+
+plt.figure(figsize=(6, 6))
+colors = ["#ff9999", "#66b3ff", "#99ff99"]
+
+# Donut chart style
+plt.pie(
+    fuel_counts,
+    labels=fuel_counts.index,
+    autopct="%1.1f%%",
+    startangle=140,
+    colors=colors,
+    pctdistance=0.85,
+    wedgeprops=dict(width=0.4, edgecolor="white", linewidth=2),
+)
+
+plt.title("Fuel Type Distribution of Vehicles", fontsize=14, fontweight="bold")
+plt.tight_layout()
+plt.show()
