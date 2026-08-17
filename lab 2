@@ -1,0 +1,25 @@
+import sqlite3
+import pandas as pd
+
+# 1. Load Dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+# 2. Inspect Dataset Structure and Statistics
+print(df.head())
+print(df.info())
+print(df.describe())
+
+# 3. Save to SQLite Database
+conn = sqlite3.connect("car_prediction.db")
+df.to_sql("car_data", conn, if_exists="replace", index=False)
+conn.close()
+
+# 4. Export to CSV
+df.to_csv("car_prediction_data_output.csv", index=False)
+
+# 5. Export to Formatted JSON
+df.to_json("car_prediction_data.json", orient="records", indent=4)
+
+# Print JSON Preview
+with open("car_prediction_data.json", "r") as file:
+    print(file.read()[:700])
