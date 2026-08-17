@@ -1,0 +1,112 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+pd.set_option("display.max_columns", None)
+
+# Load data and strip whitespace from column names
+df = pd.read_csv("/content/oil_by_country.csv")
+df.columns = df.columns.str.strip()
+
+# Initial Data Inspection
+print("=================================")
+print("FIRST FIVE ROWS")
+print("=================================")
+print(df.head())
+
+print("\nDataset Shape:")
+print(df.shape)
+
+print("\nColumn Names:")
+print(df.columns.tolist())
+
+print("\nData Types:")
+print(df.dtypes)
+
+print("\nDataset Information:")
+print(df.info())
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+print("\nDuplicate Rows:")
+print(df.duplicated().sum())
+
+# Data Cleaning
+df = df.drop_duplicates()
+
+numeric_cols = df.select_dtypes(include="number").columns
+df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
+
+print("\nMissing Values After Cleaning:")
+print(df.isnull().sum())
+
+# Statistical Analysis
+print("\nDescriptive Statistics:")
+print(df.describe())
+
+print("\nCountries with Production > 1000:")
+high_production = df[df["Production"] > 1000]
+print(high_production[["Country", "Production"]])
+
+if "Region" in df.columns:
+    print("\nAverage Oil Production by Region:")
+    region_avg = df.groupby("Region")["Production"].mean()
+    print(region_avg)
+
+print("\nCorrelation Matrix:")
+correlation = df.corr(numeric_only=True)
+print(correlation)
+
+# Visualizations
+# 1. Distribution of Production
+plt.figure(figsize=(8, 5))
+plt.hist(df["Production"], bins=20, color="skyblue", edgecolor="black")
+plt.title("Oil Production Distribution")
+plt.xlabel("Production")
+plt.ylabel("Frequency")
+plt.show()
+
+# 2. Top 10 Producing Countries
+top10 = df.sort_values(by="Production", ascending=False).head(10)
+
+plt.figure(figsize=(10, 6))
+plt.bar(top10["Country"], top10["Production"], color="green")
+plt.xticks(rotation=45)
+plt.title("Top 10 Oil Producing Countries")
+plt.xlabel("Country")
+plt.ylabel("Production")
+plt.tight_layout()
+plt.show()
+
+# 3. Production vs Consumption Scatter Plot
+if "Consumption" in df.columns:
+    plt.figure(figsize=(8, 6))
+    plt.scatter(df["Production"], df["Consumption"], color="red")
+    plt.title("Production vs Consumption")
+    plt.xlabel("Production")
+    plt.ylabel("Consumption")
+    plt.show()
+
+# 4. Boxplot for Production Outliers
+plt.figure(figsize=(7, 5))
+sns.boxplot(y=df["Production"])
+plt.title("Production Boxplot")
+plt.show()
+
+# 5. Correlation Heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(correlation, annot=True, cmap="coolwarm", linewidths=0.5)
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Top 5 by Reserves (if column exists)
+if "Reserves" in df.columns:
+    print("\nTop 5 Countries by Oil Reserves:")
+    print(
+        df[["Country", "Reserves"]]
+        .sort_values(by="Reserves", ascending=False)
+        .head()
+    )
+
+print("\nEDA Completed Successfully!")
