@@ -1,0 +1,30 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Set visual style for academic presentation
+sns.set_theme(style="whitegrid")
+plt.rcParams["font.sans-serif"] = "DejaVu Sans"
+
+# Load the dataset
+df = pd.read_csv("car_prediction_data.csv")
+
+print(df.head())
+
+# Create pivot table
+pivot_data = pd.crosstab(df["Fuel_Type"], df["Transmission"])
+
+plt.figure(figsize=(8, 5))
+sns.heatmap(pivot_data, annot=True, fmt="d", cmap="YlGnBu", cbar=True)
+
+plt.title(
+    "Vehicle Concentration: Fuel Type vs. Transmission",
+    fontsize=14,
+    fontweight="bold",
+)
+plt.xlabel("Transmission", fontsize=12)
+plt.ylabel("Fuel Type", fontsize=12)
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
